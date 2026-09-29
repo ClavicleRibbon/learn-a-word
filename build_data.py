@@ -17,11 +17,12 @@ WORD = re.compile(r"^[a-z]+$")  # single lowercase words only: no names, no phra
 def build(entry):
     # Wiktionary groups translations by sense ("fruit", "computer company"...).
     # Keep the sense with the most languages so the course teaches one meaning.
-    groups, roms = defaultdict(dict), defaultdict(dict)
+    groups, roms, names = defaultdict(dict), defaultdict(dict), {}
     for t in entry.get("translations", []):
         code, form = t.get("code"), (t.get("word") or "").strip()
         if not code or not form or code == "en":
             continue
+        names[code] = t.get("lang") or code  # Wiktionary's name, used when the browser doesn't know the code
         key = (t.get("sense") or "").strip().lower()
         forms = groups[key].setdefault(code, [])
         if form not in forms and len(forms) < 3:
@@ -35,7 +36,8 @@ def build(entry):
     definition = next((g for g in glosses if key and key in g.lower()),
                       key or (glosses[0] if glosses else ""))
     return {"w": entry["word"], "def": {"en": definition}, "tr": groups[key],
-            "rom": {c: r for c, r in roms[key].items() if c in groups[key]}}
+            "rom": {c: r for c, r in roms[key].items() if c in groups[key]},
+            "ln": {c: names[c] for c in groups[key]}}
 
 
 def main():

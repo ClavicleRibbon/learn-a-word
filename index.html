@@ -12,7 +12,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-
 main{width:100%;max-width:440px;padding:28px 0}
 main.done{filter:grayscale(1);opacity:.55}
 h1{font:600 15px system-ui;color:var(--mute);margin:0 0 24px}
-.word{font:700 clamp(56px,20vw,104px)/1 "Palatino Linotype",Palatino,"Book Antiqua",serif;letter-spacing:-.02em;margin:0 0 10px;background:linear-gradient(90deg,var(--acc) var(--p,0%),var(--line) var(--p,0%));-webkit-background-clip:text;background-clip:text;color:transparent;overflow-wrap:anywhere}
+.word{font:700 clamp(56px,20vw,104px)/1.25 "Palatino Linotype",Palatino,"Book Antiqua",serif;letter-spacing:-.02em;margin:0 0 6px;padding-bottom:.08em;text-transform:capitalize;background:linear-gradient(90deg,var(--acc) var(--p,0%),var(--line) var(--p,0%));-webkit-background-clip:text;background-clip:text;color:transparent;overflow-wrap:anywhere}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:26px 20px;text-align:center;margin:18px 0}
 .big{font:400 36px/1.25 "Palatino Linotype",Palatino,serif;margin:8px 0}
 .mute{color:var(--mute);font-size:14px}
@@ -30,7 +30,7 @@ INT=[4*H,8*H,24*H,48*H,168*H,336*H,720*H,2880*H]; // review gaps per stage; stag
 let S=JSON.parse(localStorage.getItem(K)||'null');
 const save=()=>localStorage.setItem(K,JSON.stringify(S));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const name=c=>{try{return new Intl.DisplayNames([S&&S.mother||navigator.language||'en'],{type:'language'}).of(c)||c}catch(e){return c}};
+const name=c=>{try{const n=new Intl.DisplayNames([S&&S.mother||navigator.language||'en'],{type:'language'}).of(c);if(n&&n!==c)return n}catch(e){}return(S&&S.word&&S.word.ln&&S.word.ln[c])||c};
 function hash(s){let a=0xdeadbeef,b=0x41c6ce57;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^a>>>16,2246822507)^Math.imul(b^b>>>13,3266489909);b=Math.imul(b^b>>>16,2246822507)^Math.imul(a^a>>>13,3266489909);return b>>>0}
 // Seed from non-identifying device info + time + randomness
 const makeSeed=()=>hash([navigator.language,Intl.DateTimeFormat().resolvedOptions().timeZone,screen.width,screen.height,devicePixelRatio,navigator.hardwareConcurrency,Date.now(),performance.now(),...crypto.getRandomValues(new Uint32Array(4))].join('|'));
