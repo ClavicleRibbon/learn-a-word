@@ -14,7 +14,8 @@ Open the site in Chrome (Android) or Safari (iOS) and choose "Install app" / "Ad
 
 ## Deploy
 Repo settings, Pages, deploy from the `main` branch, root folder.
-After changing app files, bump the cache name in `sw.js` (`law-v2`, `law-v3`...) so installed copies update.
+The service worker loads fresh files whenever online and uses its cache offline, so updates arrive on the next open.
+To test locally, run `python -m http.server` in this folder and open http://localhost:8000 (opening index.html directly does not work).
 
 ## Credits and licenses
 - Code: MIT, see `LICENSE`.

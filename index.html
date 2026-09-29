@@ -46,11 +46,12 @@ async function init(){
   if(!S){
     $.innerHTML='<p class=mute>Choosing your word...</p>';
     try{
-      const seed=makeSeed(),{count}=await(await fetch('data/meta.json')).json();
-      const word=await(await fetch('data/w/'+seed%count+'.json')).json();
+      const seed=makeSeed(),get=async u=>{const r=await fetch(u);if(!r.ok)throw new Error(u+' returned HTTP '+r.status);return r.json()};
+      const {count}=await get('data/meta.json');if(!(count>0))throw new Error('data/meta.json has count '+count);
+      const word=await get('data/w/'+seed%count+'.json');
       S={seed,word,mother:null,cards:{},day:'',n:0,done:false};save();
       if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
-    }catch(e){$.innerHTML='<p>Your word could not be downloaded. Connect to the internet and reload this page.</p>';return}
+    }catch(e){$.innerHTML='<p>Your word could not be loaded.</p><p class=mute>'+esc(e.message)+'</p><p class=mute>Open the app from its web address (not from a file on your computer) while online, and check that the data folder is published.</p>';return}
   }
   render();
 }
