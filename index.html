@@ -5,23 +5,32 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#f1f0f7">
 <style>
-:root{--bg:#f1f0f7;--fg:#2b2645;--mute:#6f6a8a;--card:#fff;--acc:#4f3bd6;--line:#d9d6ea;color-scheme:light dark}
-@media(prefers-color-scheme:dark){:root{--bg:#1a1730;--fg:#ece9fb;--mute:#9c97c0;--card:#24203f;--acc:#9d8cff;--line:#3a3560}}
+:root{--bg:#f1f0f7;--fg:#2b2645;--mute:#6f6a8a;--card:#fff;--acc:#4f3bd6;--line:#d9d6ea;--ok:#1f8a4c;--bad:#c93c3c;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1730;--fg:#ece9fb;--mute:#9c97c0;--card:#24203f;--acc:#9d8cff;--line:#3a3560;--ok:#2f9e5e;--bad:#d95454}}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif;min-height:100vh;display:grid;grid-template-rows:1fr auto;place-items:center;padding:env(safe-area-inset-top) 18px env(safe-area-inset-bottom)}
-main{width:100%;max-width:440px;padding:28px 0}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif;min-height:100vh;min-height:100dvh;display:grid;grid-template-rows:1fr auto;place-items:center;padding:env(safe-area-inset-top) 18px env(safe-area-inset-bottom)}
+main{width:100%;max-width:440px;padding:12px 0}
 main.done{filter:grayscale(1);opacity:.55}
-h1{font:600 15px system-ui;color:var(--mute);margin:0 0 24px}
-.word{font:700 clamp(56px,20vw,104px)/1.25 "Palatino Linotype",Palatino,"Book Antiqua",serif;letter-spacing:-.02em;margin:0 0 6px;padding-bottom:.08em;text-transform:capitalize;background:linear-gradient(90deg,var(--acc) var(--p,0%),var(--line) var(--p,0%));-webkit-background-clip:text;background-clip:text;color:transparent;overflow-wrap:anywhere}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:26px 20px;text-align:center;margin:18px 0}
-.big{font:400 36px/1.25 "Palatino Linotype",Palatino,serif;margin:8px 0}
+h1{font:600 15px system-ui;color:var(--mute);margin:0 0 10px}
+.word{font:700 clamp(44px,15vw,88px)/1.25 "Palatino Linotype",Palatino,"Book Antiqua",serif;letter-spacing:-.02em;margin:0 0 2px;padding-bottom:.08em;background:linear-gradient(90deg,var(--acc) var(--p,0%),var(--line) var(--p,0%));-webkit-background-clip:text;background-clip:text;color:transparent;overflow-wrap:anywhere}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 14px;text-align:center;margin:12px 0}
+.big{font:400 clamp(26px,8vw,34px)/1.25 "Palatino Linotype",Palatino,serif;margin:8px 0}
 .mute{color:var(--mute);font-size:14px}
 hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 button,select{font:inherit;border-radius:8px;border:1px solid var(--line);padding:13px 16px;background:var(--card);color:var(--fg);width:100%;margin-top:10px}
 button.p{background:var(--acc);border-color:var(--acc);color:var(--bg);font-weight:600}
 button:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 .row{display:flex;gap:10px}
-footer{padding:0 0 14px;font-size:12px;color:var(--mute);text-align:center}a{color:inherit}
+footer{padding:0 0 10px;font-size:12px;color:var(--mute);text-align:center}a{color:inherit}
+.cap{text-transform:capitalize}
+.pr{display:block;color:var(--mute);font-size:14px;font-weight:400;margin-top:2px}
+.def{margin:4px 0 8px;font-size:15px;line-height:1.4}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.opts button{margin:0;padding:10px 8px;overflow-wrap:anywhere}
+.opt:disabled{opacity:1}.opt:disabled:not(.ok):not(.bad){opacity:.45}
+.opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}.opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt .pr{color:inherit;opacity:.75;font-size:13px}
+@media(max-height:720px){.word{font-size:clamp(40px,13vw,68px)}.card{padding:12px}}
 </style></head><body><main id="app"></main>
 <footer>Word data: <a href="https://en.wiktionary.org/" target="_blank" rel="noopener">Wiktionary</a> contributors, via <a href="https://kaikki.org/" target="_blank" rel="noopener">Kaikki.org</a>, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></footer>
 <script>
@@ -36,7 +45,7 @@ function hash(s){let a=0xdeadbeef,b=0x41c6ce57;for(let i=0;i<s.length;i++){const
 const makeSeed=()=>hash([navigator.language,Intl.DateTimeFormat().resolvedOptions().timeZone,screen.width,screen.height,devicePixelRatio,navigator.hardwareConcurrency,Date.now(),performance.now(),...crypto.getRandomValues(new Uint32Array(4))].join('|'));
 const langs=()=>['en',...Object.keys(S.word.tr)].filter(c=>c!==S.mother);
 const form=c=>c==='en'?S.word.w:(S.word.tr[c]||[c]).join(', ');
-const rom=c=>S.word.rom&&S.word.rom[c]?`<div class=mute>${esc(S.word.rom[c])}</div>`:'';
+const pron=c=>{const x=c==='en'?S.word.ipa:S.word.rom&&S.word.rom[c];return x?`<small class=pr>${esc(x)}</small>`:''};
 const today=()=>new Date().toDateString(),cards=()=>Object.entries(S.cards);
 const due=()=>cards().filter(([c,k])=>k.s>=0&&k.s<8&&k.due<=Date.now());
 const fresh=()=>{if(S.day!==today()){S.day=today();S.n=0;save()}return cards().filter(([c,k])=>k.s<0).slice(0,Math.max(0,NEW_PER_DAY-S.n))};
@@ -60,19 +69,29 @@ function setMother(m){
   w.def=d[m]?{[m]:d[m]}:{en:d.en}; // keep only the definition you can read; drop the rest
   S.mother=m;langs().forEach(c=>S.cards[c]={s:-1,due:0});save();render();
 }
-function step(){const t=due()[0]||fresh()[0];if(!t)return render();(t[1].s<0?lesson:review)(t[0])}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function step(){const d=due(),t=d.length?d[Math.random()*d.length|0]:fresh()[0];if(!t)return render();(t[1].s<0?lesson:review)(t[0])}
 function lesson(c){
-  $.innerHTML=`<div class=card><div class=mute>${esc(form(S.mother))} in ${esc(name(c))} is</div><div class=big>${esc(form(c))}</div>${rom(c)}</div><button class=p id=ok>Got it</button>`;
+  $.innerHTML=`<div class=card><div class=big>${esc(form(S.mother))}</div>${pron(S.mother)}<div class=mute>in ${esc(name(c))} is</div><div class=big>${esc(form(c))}</div>${pron(c)}</div><button class=p id=ok>Got it</button>`;
   ok.onclick=()=>{S.cards[c]={s:0,due:Date.now()+INT[0]};S.n++;save();step()};
 }
 function review(c){
-  const k=S.cards[c],flip=k.s%2; // alternate: word to language, language to word
-  const q=flip?`<div class=mute>Which language is this?</div><div class=big>${esc(form(c))}</div>`:`<div class=mute>How do you say</div><div class=big>${esc(form(S.mother))}</div><div class=mute>in ${esc(name(c))}?</div>`;
-  const ans=flip?`<div class=big>${esc(name(c))}</div>`:`<div class=big>${esc(form(c))}</div>${rom(c)}`;
-  $.innerHTML=`<div class=card>${q}<div id=ans hidden><hr>${ans}</div></div><button class=p id=show>Show answer</button><div class=row id=grade hidden><button id=no>Missed</button><button class=p id=yes>Got it</button></div>`;
-  show.onclick=()=>{ans.hidden=grade.hidden=false;show.hidden=true};
-  const rate=r=>{k.s=r?k.s+1:Math.max(0,k.s-2);k.due=Date.now()+(r?(k.s<8?INT[k.s]:0):6e5);save();step()};
-  no.onclick=()=>rate(0);yes.onclick=()=>rate(1);
+  const k=S.cards[c],flip=k.s%2,seen=cards().filter(([x,v])=>v.s>=0).map(e=>e[0]),pool=seen.filter(x=>S.cards[x].s<8);
+  const key=x=>flip?name(x):form(x),uniq=a=>a.filter((x,i)=>a.findIndex(y=>key(y)===key(x))===i),pick=l=>uniq(shuffle(l.filter(x=>x!==c&&key(x)!==key(c))));
+  let o=pick(pool).slice(0,7); // other unmastered languages you have met, at most 7 to fit the screen
+  if(o.length<3)o=uniq([...o,...pick(seen.filter(x=>!o.includes(x)))]).slice(0,3);
+  o=shuffle([c,...o]);
+  const q=flip?`<div class=mute>Which language is this?</div><div class=big>${esc(form(c))}</div>${pron(c)}`:`<div class=mute>How do you say</div><div class=big>${esc(form(S.mother))}</div>${pron(S.mother)}<div class=mute>in ${esc(name(c))}?</div>`;
+  const label=x=>flip?esc(name(x)):esc(form(x))+pron(x);
+  $.innerHTML=`<div class=card>${q}</div><div class=opts>${o.map(x=>`<button class=opt data-c="${x}">${label(x)}</button>`).join('')}</div><button class=p id=next hidden>Continue</button>`;
+  let locked=false;const all=$.querySelectorAll('.opt');
+  all.forEach(b=>b.onclick=()=>{
+    if(locked)return;locked=true;const r=b.dataset.c===c;
+    k.s=r?k.s+1:Math.max(0,k.s-2);k.due=Date.now()+(r?(k.s<8?INT[k.s]:0):6e5);save();
+    all.forEach(x=>{x.disabled=true;if(x.dataset.c===c)x.classList.add('ok');else if(x===b)x.classList.add('bad')});
+    if(r)setTimeout(step,700);else next.hidden=false;
+  });
+  next.onclick=step;
 }
 function render(){
   if(!S.mother){
@@ -83,7 +102,7 @@ function render(){
   const cs=cards(),mastered=cs.filter(([c,k])=>k.s>=8).length;
   if(!S.done&&mastered===cs.length){S.done=true;save()}
   const p=cs.reduce((t,[c,k])=>t+Math.max(0,k.s),0)/(8*cs.length)*100,w=S.word,d=Object.values(w.def||{})[0]||'';
-  const head=`<h1>Learn a Word</h1><div class=word style="--p:${p}%">${esc(w.w)}</div>${S.mother!=='en'?`<div class=big>${esc(form(S.mother))}</div>`:''}<p>${esc(d)}</p><div class=mute>${mastered} of ${cs.length} languages mastered</div>`;
+  const head=`<h1>Learn a Word</h1><div class="word${S.mother==='en'?' cap':''}" style="--p:${p}%">${esc(form(S.mother))}</div>${pron(S.mother)}<p class=def>${esc(d)}</p><div class=mute>${mastered} of ${cs.length} languages mastered</div>`;
   $.className=S.done?'done':'';
   if(S.done){$.innerHTML=head+'<div class=card>Course complete.<br><span class=mute>Reinstall the app to learn a new word.</span></div>';return}
   const L=fresh().length,R=due().length,nx=cs.reduce((a,[c,k])=>k.s>=0&&k.s<8?Math.min(a,k.due):a,1/0);

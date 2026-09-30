@@ -37,7 +37,8 @@ def build(entry):
                       key or (glosses[0] if glosses else ""))
     return {"w": entry["word"], "def": {"en": definition}, "tr": groups[key],
             "rom": {c: r for c, r in roms[key].items() if c in groups[key]},
-            "ln": {c: names[c] for c in groups[key]}}
+            "ln": {c: names[c] for c in groups[key]},
+            "ipa": next((s["ipa"] for s in entry.get("sounds", []) if s.get("ipa")), "")}
 
 
 def main():
